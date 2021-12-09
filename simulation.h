@@ -22,7 +22,6 @@ class Simulation: public World {
         void checkVirusColisions();
         bool checkFull();
         void resetGrid();
-        
 };
 
 #endif    //   SIMULATION_H_
