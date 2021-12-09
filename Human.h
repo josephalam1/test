@@ -3,11 +3,14 @@
 #define HUMAN_H_
 #include <iostream>
 #include <string>
+#include <vector>
+using std::vector;
 class Human {
      public:
         Human();
+        bool operator==(const Human human);
         void move();
-        std::string toString() const;
+        std::string toString();
         int xPos, yPos, age;
         bool male;
         float immunity = 1.0;
