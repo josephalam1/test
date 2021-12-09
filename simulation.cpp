@@ -2,10 +2,19 @@
 #include "./simulation.h"
 Simulation::Simulation() {
     day = 0;
-    this->initGrid();
     std::srand(time(0));
+    this->initGrid();
 }
 void Simulation::PrintGrid() {
+    resetGrid();
+    for (Virus virus : viruses) {
+        grid[virus.yPos][virus.xPos] = virus.toString();
+    }
+    for (Human human : players) {
+        grid[human.yPos][human.xPos] = human.toString();
+        std::cout << "Displaying player at: " << human.xPos << ", " << human.yPos << "\n";
+
+    }
     std::cout << "World at Day " << day <<
     "             # of people left: " << players.size() << endl;
     std::cout <<
@@ -28,51 +37,51 @@ void Simulation::resetGrid() {
     }
 }
 void Simulation::initGrid() {
-    resetGrid();
     for (int i = 0; i < 10; i++) {
         Human human;
         human.age = std::rand() % 65;
         players.push_back(human);
-        grid[human.xPos][human.yPos] = human.toString();
     }
     Virus virus;
     viruses.push_back(virus);
-    grid[virus.xPos][virus.yPos] = virus.toString();
-    this->PrintGrid();
-    this->UpdateGrid();
+    UpdateGrid();
 }
 void Simulation::UpdateGrid() {
-    while(day < 7000) {
-        day += 1;
+    resetGrid();
+    while (day < 10) {
+        day++;
         if (day % 10 == 0) {
             Virus virus;
             viruses.push_back(virus);
         }
-        resetGrid();
+        if (day % 50 == 0) {
+            viruses.erase(viruses.begin());
+        }
         for (Virus virus : viruses) {
             virus.move();
-            grid[virus.xPos][virus.yPos] = virus.toString();
         }
         for (Human human : players) {
+std::cout << "-Player previous position: " << human.xPos << ", " << human.yPos << "\n";
             human.move();
-            grid[human.xPos][human.yPos] = human.toString();
+std::cout << "-Player current position: " << human.xPos << ", " << human.yPos << "\n";
         }
         checkPlayerColisions();
         checkVirusColisions();
-        this->PrintGrid();
-        if (checkFull()) break;
+        PrintGrid();
+        if (checkFull() || players.size() == 0) break;
+    }
+    if (players.size() <= 0) {
+        std::cout <<
+        "\nThe last remaining human passed away on day " << day + 1 << "\n";
     }
 }
 void Simulation::checkPlayerColisions() {
     for (int i = 0; i < players.size(); i++) {
         for (int j = i + 1; j < players.size(); j++) {
-            if (players[i].xPos == players[j].xPos
-             && players[i].yPos == players[j].yPos
-             && players[i].male != players[j].male
-             && players[i].age >= 18 && players[j].age >= 18) {
-                 Human human;
+            if (players[i] == players[j]) {
+                std::cout << "TWO PLAYERS FUCKING COLLIDED\n\n\n\n\n\n";
+                Human human;
                 players.push_back(human);
-                // players.insert(players.begin(), human);
             }
         }
     }
@@ -82,12 +91,12 @@ void Simulation::checkVirusColisions() {
         for (int i = 0; i < players.size(); i++) {
             if (virus.xPos == players[i].xPos
              && virus.yPos == players[i].yPos) {
-                 if (players[i].age < 4 || players[i].age >= 60
+                 if (players[i].age < 3 || players[i].age >= 60
                  || players[i].immunity <= 0.25) {
                     players.erase(players.begin() + i);
                  } else {
-                    float amount = static_cast<float>(std::rand()) / static_cast<float>(RAND_MAX);
-                    players[i].immunity -= amount;
+                    players[i].immunity -=
+                static_cast<float>(std::rand()) / static_cast<float>(RAND_MAX);
                 }
             }
         }
@@ -97,8 +106,7 @@ void Simulation::checkVirusColisions() {
 bool Simulation::checkFull() {
     for (int i = 0; i < 10; i++) {
         for (int j = 0; j < 10; j++) {
-            if (grid[i][j] == "  ")
-                return false;
+            if (grid[i][j] == "  ") return false;
         }
     }
     return true;
