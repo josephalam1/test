@@ -16,11 +16,22 @@ void Human::move() {
     int r2 = std::rand() % 3 - 1;
     if (   this->xPos + r1 < 10 && this->xPos + r1 >= 0
         && this->yPos + r2 < 10 && this->yPos + r2 >= 0) {
-        this->xPos += r1;
-        this->yPos += r2;
+                std::cout << " Player moved from " << this->xPos << ", " << this->yPos << " to " << 
+    this->xPos + r1 << ", " << this->yPos + r2 << "\n";
+        xPos += r1;
+        yPos += r2;
     }
 }
-std::string Human::toString() const {
+bool Human::operator==(const Human human) {
+        if (this->xPos == human.xPos && this->yPos == human.yPos) {
+    /*
+    if (this->xPos == human.xPos && this->yPos == human.yPos
+        && this->male != human.male && this->age >= 18 && human.age >= 18) {
+        return true; */
+    }
+    return false;
+}
+std::string Human::toString() {
     if (age > 5 && age < 18) {
         if (male)
             return "👦";
